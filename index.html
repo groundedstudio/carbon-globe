@@ -13,30 +13,56 @@
     <script>
         const colorScale = d3.scaleSequentialSqrt(d3.interpolateRdYlGn);
 
-        // GDP per capita (avoiding countries with small pop)
+        // CO2 per capita.
         const getVal = feat => feat.properties.CO2_PER_CAPITA;
 
-        fetch('./countries_with_carbon.geojson').then(res => res.json()).then(countries =>
+        // Format CO2 for display in tooltip.
+        const getCo2 = co2 => {
+            if (co2 == null) {
+                return("Unknown")
+            } else {
+                return(co2.toFixed(2))
+            }
+        };
+
+        // Get total co2 for country.
+        const getCo2Total = (co2, pop) => {
+            if (co2 == null) {
+                return("Unknown")
+            } else {
+                return(co2 * pop)
+            }
+        }
+
+        const getColour = feat => {
+            if (feat.properties.CO2_PER_CAPITA == null) {
+                return('#C2C5CC');
+            } else {
+                return(colorScale(getVal(feat)))
+            }
+        };
+
+        fetch('https://raw.githubusercontent.com/sam-drew/carbon-visualiser/master/countries_with_carbon.geojson').then(res => res.json()).then(countries =>
         {
-            const maxVal = Math.max(...countries.features.map(getVal));
-            colorScale.domain([maxVal, 0]);
+            //const maxVal = Math.max(...countries.features.map(getVal));
+            colorScale.domain([18, 0]);
 
             const world = Globe()
-            .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
             .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
             .polygonsData(countries.features)
             .polygonAltitude(0.06)
-            .polygonCapColor(feat => colorScale(getVal(feat)))
+            .polygonCapColor(feat => getColour(feat))
             .polygonSideColor(() => 'rgba(0, 100, 0, 0.15)')
             .polygonStrokeColor(() => '#111')
             .polygonLabel(({ properties: d }) => `
             <b>${d.ADMIN} (${d.ISO_A2}):</b> <br />
-            GDP: <i>${d.GDP_MD_EST}</i> M$<br/>
-            Population: <i>${d.POP_EST}</i>
+            CO2 p.p: <i>${getCo2(d.CO2_PER_CAPITA)}</i> T/year</br>
+            CO2 total: <i>${getCo2Total(d.CO2_PER_CAPITA, d.POP_EST).toLocaleString(undefined, { maximumFractionDigits: 0})}</i> T</br>
+            Population: <i>${d.POP_EST.toLocaleString(undefined, { minimumFractionDigits: 0 })}</i>
             `)
             .onPolygonHover(hoverD => world
             .polygonAltitude(d => d === hoverD ? 0.12 : 0.06)
-            .polygonCapColor(d => d === hoverD ? 'steelblue' : colorScale(getVal(d)))
+            .polygonCapColor(d => d === hoverD ? 'steelblue' : getColour(d))
             )
             .polygonsTransitionDuration(300)
             (document.getElementById('globeViz'))
