@@ -1,29 +1,17 @@
-# README #
+# Carbon Visualiser #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+A visualisation of the world's carbon dioxide output.
 
-### What is this repository for? ###
+## Attribution
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+### Libs
 
-### How do I get set up? ###
+3D globe rendering not possible without [globe.gl](https://github.com/vasturiano/globe.gl).
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+Colour scaling not possible without [D3](d3js.org).
 
-### Contribution guidelines ###
+### Data
 
-* Writing tests
-* Code review
-* Other guidelines
+Geojson map of the world is from [here](https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_110m_admin_0_countries.geojson).
 
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+Per capita carbon output is from [here](blob:https://ourworldindata.org/3b62ec3f-8b0c-4cbf-b4b2-6b2f32310680).
