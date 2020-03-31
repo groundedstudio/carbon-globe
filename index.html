@@ -1,8 +1,10 @@
 <head>
+    <title>Carbon Visualiser</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style> body { margin: 0; } </style>
-
+    
     <script src="https://unpkg.com/d3"></script>
-
     <script src="https://unpkg.com/globe.gl"></script>
     <!--<script src="../../dist/globe.gl.js"></script>-->
 </head>
@@ -55,10 +57,12 @@
             .polygonSideColor(() => 'rgba(0, 100, 0, 0.15)')
             .polygonStrokeColor(() => '#111')
             .polygonLabel(({ properties: d }) => `
-            <b>${d.ADMIN} (${d.ISO_A2}):</b> <br />
-            CO2 p.p: <i>${getCo2(d.CO2_PER_CAPITA)}</i> T/year</br>
-            CO2 total: <i>${getCo2Total(d.CO2_PER_CAPITA, d.POP_EST).toLocaleString(undefined, { maximumFractionDigits: 0})}</i> T</br>
-            Population: <i>${d.POP_EST.toLocaleString(undefined, { minimumFractionDigits: 0 })}</i>
+            <div style="background-color:#999;padding:10px;border-radius:5px;">
+                <b>${d.ADMIN} (${d.ISO_A2}):</b> <br />
+                CO2 p.p: <i>${getCo2(d.CO2_PER_CAPITA)}</i> T/year</br>
+                CO2 total: <i>${getCo2Total(d.CO2_PER_CAPITA, d.POP_EST).toLocaleString(undefined, { maximumFractionDigits: 0})}</i> T</br>
+                Population: <i>${d.POP_EST.toLocaleString(undefined, { minimumFractionDigits: 0 })}</i>
+            </div>
             `)
             .onPolygonHover(hoverD => world
             .polygonAltitude(d => d === hoverD ? 0.12 : 0.06)
