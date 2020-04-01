@@ -35,6 +35,9 @@
         <button onclick="openAbout()" id="openAbout" style="color:white;background-color:black;float:right;font-size:1em">About &#9650</button>
 
     <script>
+        // Keep track of the mode by which the country cap colour is calculated.
+        var colourMode = 'perPerson';
+
         // function for opening the about tab.
         function openAbout() {
             var aboutText = document.getElementById("aboutText");
@@ -52,10 +55,12 @@
         // Globe stuff.
 
         // Set colourscale.
-        const colorScale = d3.scaleSequentialSqrt(d3.interpolateRdYlGn);
+        const colorScale = d3.scaleSequentialQuantile(d3.interpolateRdYlGn);
+
+        console.log(d3.interpolateRdYlGn);
 
         // CO2 per capita.
-        const getVal = feat => feat.properties.CO2_PER_CAPITA;
+        const getVal = (feat, max) => (max - feat.properties.CO2_PER_CAPITA);
 
         // Format CO2 for display in tooltip.
         const getCo2 = co2 => {
@@ -75,24 +80,24 @@
             }
         }
 
-        const getColour = feat => {
+        const getColour = (feat, max) => {
             if (feat.properties.CO2_PER_CAPITA == null) {
                 return('#C2C5CC');
             } else {
-                return(colorScale(getVal(feat)))
+                return(colorScale(getVal(feat, max)))
             }
         };
 
         fetch('https://raw.githubusercontent.com/sam-drew/carbon-visualiser/master/50m_countries_with_carbon.geojson').then(res => res.json()).then(countries =>
         {
-            //const maxVal = Math.max(...countries.features.map(getVal));
-            colorScale.domain([18, 0]);
+            const maxVal = Math.max(...countries.features.map((feature) => feature.properties.CO2_PER_CAPITA));
+            colorScale.domain(countries.features.map((feature) => (maxVal - feature.properties.CO2_PER_CAPITA)));
 
             const world = Globe()
             .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
             .polygonsData(countries.features)
             .polygonAltitude(0.1)
-            .polygonCapColor(feat => getColour(feat))
+            .polygonCapColor(feat => getColour(feat, maxVal))
             .polygonSideColor(() => 'rgba(119, 221, 119, 0.15)')
             .polygonStrokeColor(() => '#111')
             .polygonLabel(({ properties: d }) => `
@@ -105,7 +110,7 @@
             `)
             .onPolygonHover(hoverD => world
             .polygonAltitude(d => d === hoverD ? 0.15 : 0.1)
-            .polygonCapColor(d => d === hoverD ? 'steelblue' : getColour(d))
+            .polygonCapColor(d => d === hoverD ? 'steelblue' : getColour(d, maxVal))
             )
             .polygonsTransitionDuration(300)
             (document.getElementById('globeViz'))
