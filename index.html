@@ -1,9 +1,11 @@
 <head>
     <title>Carbon Visualiser</title>
 
+    <link rel="icon" href="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/237/earth-globe-europe-africa_1f30d.png">
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style> body { margin: 0; } </style>
-    
+    <style> body { margin: 0; } html { background-color: black; } </style>
+
     <script src="https://unpkg.com/d3"></script>
     <script src="https://unpkg.com/globe.gl"></script>
     <!--<script src="../../dist/globe.gl.js"></script>-->
@@ -11,6 +13,9 @@
 
 <body>
     <div id="globeViz"></div>
+    <div style="position:absolute;top:0;width:100%;text-align:center;">
+        <h1 style="color:white;font-family:Helvetica;">Carbon Visualiser</h1>
+    </div>
 
     <script>
         const colorScale = d3.scaleSequentialSqrt(d3.interpolateRdYlGn);
@@ -44,7 +49,7 @@
             }
         };
 
-        fetch('https://raw.githubusercontent.com/sam-drew/carbon-visualiser/master/countries_with_carbon.geojson').then(res => res.json()).then(countries =>
+        fetch('https://raw.githubusercontent.com/sam-drew/carbon-visualiser/master/50m_countries_with_carbon.geojson').then(res => res.json()).then(countries =>
         {
             //const maxVal = Math.max(...countries.features.map(getVal));
             colorScale.domain([18, 0]);
@@ -52,12 +57,12 @@
             const world = Globe()
             .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
             .polygonsData(countries.features)
-            .polygonAltitude(0.06)
+            .polygonAltitude(0.1)
             .polygonCapColor(feat => getColour(feat))
             .polygonSideColor(() => 'rgba(0, 100, 0, 0.15)')
             .polygonStrokeColor(() => '#111')
             .polygonLabel(({ properties: d }) => `
-            <div style="background-color:#999;padding:10px;border-radius:5px;">
+            <div style="background-color:#000;padding:10px;border-radius:5px;border-width:1px;border-style:solid;border-color:#FFF;">
                 <b>${d.ADMIN} (${d.ISO_A2}):</b> <br />
                 CO2 p.p: <i>${getCo2(d.CO2_PER_CAPITA)}</i> T/year</br>
                 CO2 total: <i>${getCo2Total(d.CO2_PER_CAPITA, d.POP_EST).toLocaleString(undefined, { maximumFractionDigits: 0})}</i> T</br>
@@ -65,7 +70,7 @@
             </div>
             `)
             .onPolygonHover(hoverD => world
-            .polygonAltitude(d => d === hoverD ? 0.12 : 0.06)
+            .polygonAltitude(d => d === hoverD ? 0.15 : 0.1)
             .polygonCapColor(d => d === hoverD ? 'steelblue' : getColour(d))
             )
             .polygonsTransitionDuration(300)
