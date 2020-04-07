@@ -1,4 +1,4 @@
-# Carbon Visualiser #
+# Carbon Globe #
 
 A visualisation of the world's carbon dioxide output.
 
